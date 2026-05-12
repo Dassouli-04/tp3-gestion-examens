@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liste des examens</title>
+</head>
+<body>
+  <h1>Examens enregistrés</h1>
+
+  <input type="text" id="proprietaire" placeholder="Nom du propriétaire">
+  <button id="afficher">Afficher</button>
+
+  <div id="resultat"></div>
+
+  <script>
+    document.getElementById('afficher').addEventListener('click', () => {
+
+      const proprietaire = document.getElementById('proprietaire').value.trim();
+
+      if (!proprietaire) {
+        alert('Veuillez saisir le nom du propriétaire.');
+        return;
+      }
+
+      
+      const key = 'examens_' + proprietaire;
+      const exams = JSON.parse(localStorage.getItem(key)) || [];
+
+      
+      const resultat = document.getElementById('resultat');
+      resultat.innerHTML = '';
+
+      
+      if (exams.length === 0) {
+        resultat.textContent = 'Aucun examen trouvé pour ce propriétaire.';
+        return;
+      }
+
+       
+      exams.forEach((exam, i) => {
+        const divExam = document.createElement('div');
+        divExam.className = 'exam';
+
+        const titre = document.createElement('h2');
+        titre.textContent = (i + 1) + '. ' + exam.nom;
+
+        const details = document.createElement('p');
+        details.textContent = 'Durée : ' + exam.duree + ' minutes | Description : ' + exam.description;
+
+        divExam.appendChild(titre);
+        divExam.appendChild(details);
+
+        
+        const ul = document.createElement('ul');
+        exam.questions.forEach(q => {
+          const li = document.createElement('li');
+          li.textContent = q.enonce + ' (' + q.points + ' points, ' + q.duree + ' secondes)';
+
+          
+          const sousListe = document.createElement('ul');
+          q.propositions.forEach(p => {
+            const propLi = document.createElement('li');
+            propLi.textContent = p.texte + (p.correcte ? ' ✅' : '');
+            sousListe.appendChild(propLi);
+          });
+
+          li.appendChild(sousListe);
+          ul.appendChild(li);
+        });
+
+        divExam.appendChild(ul);
+        resultat.appendChild(divExam);
+      });
+    });
+  </script>
+</body>
+</html>
